@@ -1,0 +1,17 @@
+<html>
+
+<body>
+    <h1>координаты нажатия кнопки мыши</h1>
+
+    <script>
+        document.addEventListener("click", function (event) {
+            var x = event.clientX;
+            var y = event.clientY;
+            var coordinatesElement = document.createElement("p");
+            coordinatesElement.textContent = "координаты нажатия кнопки мыши: (" + x + ", " + y + ")";
+            document.body.appendChild(coordinatesElement);
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,178 @@
+<html>
+
+<head>
+  <meta charset="utf-8">
+  </meta>
+  <title>Human Data</title>
+</head>
+
+<body>
+  <button id="load-btn">Загрузить</button>
+  <div id="table-container"></div>
+  <script type="module">
+    import { getData } from './humansData.js';
+
+    const tableContainer = document.getElementById('table-container');
+    const loadBtn = document.getElementById('load-btn');
+    const headers = ['First Name', 'Last Name', 'Gender', 'Address', 'Phone', 'Age'];
+    let data = [];
+
+    function createTable() {
+      const table = document.createElement('table');
+      const thead = document.createElement('thead');
+      const tbody = document.createElement('tbody');
+      const tr = document.createElement('tr');
+      for (const header of headers) {
+        const th = document.createElement('th');
+        th.textContent = header;
+        tr.appendChild(th);
+      }
+      thead.appendChild(tr);
+      table.appendChild(thead);
+      for (const human of data) {
+        const tr = document.createElement('tr');
+        for (const header of headers) {
+          const td = document.createElement('td');
+          td.textContent = human[header.toLowerCase().replace(' ', '')];
+          tr.appendChild(td);
+        }
+        switch (true) {
+          case human.age < 18:
+            tr.classList.add('green');
+            break;
+          case human.age < 60:
+            tr.classList.add('yellow');
+            break;
+          default:
+            tr.classList.add('red');
+        }
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+      tableContainer.innerHTML = '';
+      tableContainer.appendChild(table);
+    }
+
+    loadBtn.addEventListener('click', async () => {
+      data = await getData();
+      createTable();
+    });
+
+    tableContainer.addEventListener('click', event => {
+      if (event.target.tagName === 'TD') {
+        const td = event.target;
+        const tr = td.parentNode;
+        const index = Array.from(tr.parentNode.children).indexOf(tr) - 1;
+        const header = headers[Array.from(tr.children).indexOf(td)];
+        const value = td.textContent;
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = value;
+        input.addEventListener('blur', () => {
+          data[index][header.toLowerCase().replace(' ', '')] = input.value;
+          createTable();
+        });
+        td.textContent = '';
+        td.appendChild(input);
+      }
+    });
+
+    function filterTable(gender) {
+      const filterFunc = gender === 'male' ? human => human.gender === 'male' : gender === 'female' ? human => human.gender === 'female'
+        : human => true;
+      data = data.filter(filterFunc);
+      createTable();
+    }
+
+    const radioMale = document.createElement('input');
+    radioMale.type = 'radio';
+    radioMale.name = 'gender';
+    radioMale.value = 'male';
+    radioMale.addEventListener('change', () => filterTable('male'));
+    const labelMale = document.createElement('label');
+    labelMale.textContent = 'Мужчины';
+    const radioFemale = document.createElement('input');
+    radioFemale.type = 'radio';
+    radioFemale.name = 'gender';
+    radioFemale.value = 'female';
+    radioFemale.addEventListener('change', () => filterTable('female'));
+    const labelFemale = document.createElement('label');
+    labelFemale.textContent = 'Женщины';
+    const radioBoth = document.createElement('input');
+    radioBoth.type = 'radio';
+    radioBoth.name = 'gender';
+    radioBoth.value = 'both';
+    radioBoth.checked = true;
+    radioBoth.addEventListener('change', () => filterTable('both'));
+    const labelBoth = document.createElement('label');
+    labelBoth.textContent = 'Все';
+    const filterContainer = document.createElement('div');
+    filterContainer.appendChild(radioMale);
+    filterContainer.appendChild(labelMale);
+    filterContainer.appendChild(radioFemale);
+    filterContainer.appendChild(labelFemale);
+    filterContainer.appendChild(radioBoth);
+    filterContainer.appendChild(labelBoth);
+    tableContainer.insertAdjacentElement('afterend', filterContainer);
+
+    function deleteSelectedRows() {
+      const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]:checked');
+      for (const checkbox of checkboxes) {
+        const tr = checkbox.parentNode.parentNode;
+        const index = Array.from(tr.parentNode.children).indexOf(tr) - 1;
+        data.splice(index, 1);
+      }
+      createTable();
+    }
+
+    function deleteAllRows() {
+      data = [];
+      createTable();
+    }
+
+    function addRow() {
+      data.push({ firstName: '', lastName: '', gender: '', address: '', phone: '', age: '' });
+      createTable();
+    }
+
+    const deleteSelectedRowsBtn = document.createElement('button');
+    deleteSelectedRowsBtn.textContent = 'Удалить выбранные записи';
+    deleteSelectedRowsBtn.addEventListener('click', deleteSelectedRows);
+    const deleteAllRowsBtn = document.createElement('button');
+    deleteAllRowsBtn.textContent = 'Удалить все записи';
+    deleteAllRowsBtn.addEventListener('click', deleteAllRows);
+    const addRowBtn = document.createElement('button');
+    addRowBtn.textContent = 'Добавить запись';
+    addRowBtn.addEventListener('click', addRow);
+    const actionsContainer = document.createElement('div');
+    actionsContainer.appendChild(deleteSelectedRowsBtn);
+    actionsContainer.appendChild(deleteAllRowsBtn);
+    actionsContainer.appendChild(addRowBtn);
+    tableContainer.insertAdjacentElement('afterend', actionsContainer);
+  </script>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+
+    th,
+    td {
+      border: 1px solid black;
+      padding: 5px;
+    }
+
+    .green {
+      background-color: green;
+    }
+
+    .yellow {
+      background-color: yellow;
+    }
+
+    .red {
+      background-color: red;
+    }
+  </style>
+</body>
+
+</html>

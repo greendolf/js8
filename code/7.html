@@ -1,0 +1,20 @@
+<html>
+
+<body>
+    <ul id="list"></ul>
+    <script>
+        while (true) {
+            const item = prompt("введите значение элемента");
+            if (item) {
+                const listItem = document.createElement("li");
+                listItem.textContent = item;
+                list.appendChild(listItem);
+            }
+            else {
+                break
+            }
+        }
+    </script>
+</body>
+
+</html>
