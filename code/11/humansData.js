@@ -6,10 +6,19 @@ export async function getData() {
 
     const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
 
-    const randomName = () => {
-        const names = ['John', 'Bob', 'Alice', 'Emily', 'Oliver', 'Liam'];
+    const randomName = (gender) => {
+        const male_names = ['John', 'Bob', 'Oliver', 'Liam'];
+        const female_names = ['Alice', 'Emily', 'Ann', 'Mary']
         const surnames = ['Smith', 'Johnson', 'Williams', 'Jones', 'Brown', 'Davis'];
-        return { firstName: names[randomInt(0, names.length - 1)], lastName: surnames[randomInt(0, surnames.length - 1)] };
+        let dict = {};
+        dict.lastname = surnames[randomInt(0, surnames.length - 1)];
+        if (gender === 'male') {
+            dict.firstname = male_names[randomInt(0, male_names.length - 1)]
+        }
+        else {
+            dict.firstname = female_names[randomInt(0, female_names.length - 1)]
+        }
+        return dict;
     };
 
     const randomGender = () => GENDERS[randomInt(0, GENDERS.length - 1)];
@@ -21,12 +30,12 @@ export async function getData() {
     const randomAge = () => randomInt(17, 80);
 
     const randomHuman = () => {
-        const { firstName, lastName } = randomName();
         const gender = randomGender();
+        const { firstname, lastname } = randomName(gender);
         const address = randomAddress();
         const phone = randomPhone();
         const age = randomAge();
-        return { firstName, lastName, gender, address, phone, age };
+        return { firstname, lastname, gender, address, phone, age };
     };
 
     const arr = [];

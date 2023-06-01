@@ -16,6 +16,7 @@
     const loadBtn = document.getElementById('load-btn');
     const headers = ['First Name', 'Last Name', 'Gender', 'Address', 'Phone', 'Age'];
     let data = [];
+    let disp_data = [];
 
     function createTable() {
       const table = document.createElement('table');
@@ -29,7 +30,7 @@
       }
       thead.appendChild(tr);
       table.appendChild(thead);
-      for (const human of data) {
+      for (const human of disp_data) {
         const tr = document.createElement('tr');
         for (const header of headers) {
           const td = document.createElement('td');
@@ -47,6 +48,11 @@
             tr.classList.add('red');
         }
         tbody.appendChild(tr);
+        const check = document.createElement('input');
+        const check_td = document.createElement('td')
+        check.type = 'checkbox';
+        check_td.appendChild(check)
+        tr.appendChild(check_td)
       }
       table.appendChild(tbody);
       tableContainer.innerHTML = '';
@@ -55,14 +61,16 @@
 
     loadBtn.addEventListener('click', async () => {
       data = await getData();
+      disp_data = data;
       createTable();
+      radioBoth.checked = true;
     });
 
     tableContainer.addEventListener('click', event => {
-      if (event.target.tagName === 'TD') {
+      if (event.target.tagName === 'TD' && event.target.children.length === 0) {
         const td = event.target;
         const tr = td.parentNode;
-        const index = Array.from(tr.parentNode.children).indexOf(tr) - 1;
+        const index = Array.from(tr.parentNode.children).indexOf(tr);
         const header = headers[Array.from(tr.children).indexOf(td)];
         const value = td.textContent;
         const input = document.createElement('input');
@@ -80,7 +88,7 @@
     function filterTable(gender) {
       const filterFunc = gender === 'male' ? human => human.gender === 'male' : gender === 'female' ? human => human.gender === 'female'
         : human => true;
-      data = data.filter(filterFunc);
+      disp_data = data.filter(filterFunc);
       createTable();
     }
 
@@ -117,21 +125,28 @@
 
     function deleteSelectedRows() {
       const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]:checked');
-      for (const checkbox of checkboxes) {
-        const tr = checkbox.parentNode.parentNode;
-        const index = Array.from(tr.parentNode.children).indexOf(tr) - 1;
+      console.log(checkboxes);
+      for (let i = 0; i < checkboxes.length; i++) {
+        const row = document.querySelector('tbody input[type="checkbox"]:checked');
+        row.checked = false
+        const tr = row.parentNode.parentNode;
+        const index = Array.from(tr.parentNode.children).indexOf(tr) - i;
+        console.log(index);
         data.splice(index, 1);
       }
+      disp_data = data;
       createTable();
     }
 
     function deleteAllRows() {
+      disp_data = [];
       data = [];
       createTable();
     }
 
     function addRow() {
       data.push({ firstName: '', lastName: '', gender: '', address: '', phone: '', age: '' });
+      disp_data = data;
       createTable();
     }
 
